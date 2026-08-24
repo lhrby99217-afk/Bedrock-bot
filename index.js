@@ -1,30 +1,31 @@
-const { createClient } = require('bedrock-protocol');
-const express = require('express');
+const bedrock = require('bedrock-protocol');
+const http = require('http');
 
-// سيرفر ويب وهمي عشان تظل الاستضافة شغالة 24/7
-const app = express();
+// 1. إنشاء سيرفر ويب وهمي عشان استضافة Render ما تطفي
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Bot is running and alive!\n');
+});
+
 const PORT = process.env.PORT || 3000;
-
-app.get('/', (req, res) => {
-    res.send('Bedrock Bot is running 24/7!');
+server.listen(PORT, () => {
+    console.log(`HTTP server is listening on port ${PORT}`);
 });
 
-app.listen(PORT, () => {
-    console.log(`Web server running on port ${PORT}`);
-});
-
-// بيانات سيرفر الماين كرفت
-function startBot() {
-    const client = createClient({
-        host: 'LastEzdeath.aternos.me', 
-        port: 45027,                  
-        username: 'AfkBot',          
-        offline: true,               
-        skipPing: true               // هذا السطر الجديد يمنع مشكلة التايم آوت ويتصل مباشرة
+// 2. إعدادات بوت ماين كرفت بيدروك
+function createBot() {
+    console.log('جاري محاولة الاتصال بسيرفر أترنوس...');
+    
+    const client = bedrock.createClient({
+        host: 'LastEzdeath.aternos.me',
+        port: 45027,       // البورت المحدث
+        username: 'A',     // اسم البوت
+        version: '1.26.44.3', // إصدار السيرفر الحالي
+        offline: true      // لأن السيرفر مكرك/أترنوس
     });
 
     client.on('spawn', () => {
-        console.log('تم دخول البوت إلى السيرفر بنجاح!');
+        console.log('تم دخول البوت (A) إلى السيرفر بنجاح! 🚀');
     });
 
     client.on('error', (err) => {
@@ -32,9 +33,9 @@ function startBot() {
     });
 
     client.on('close', () => {
-        console.log('انفصل البوت، جارِ إعادة المحاولة بعد 10 ثوانٍ...');
-        setTimeout(startBot, 10000);
+        console.log('انقطع الاتصال بالسيرفر، سيتم إعادة المحاولة بعد 10 ثواني...');
+        setTimeout(createBot, 10000); // يحاول يدخل تلقائيًا لو فصل
     });
 }
 
-startBot();
+createBot();
