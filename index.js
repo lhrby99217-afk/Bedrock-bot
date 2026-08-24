@@ -1,10 +1,10 @@
 const bedrock = require('bedrock-protocol');
 const http = require('http');
 
-// 1. إنشاء سيرفر ويب وهمي عشان استضافة Render ما تطفي
+// 1. سيرفر ويب وهمي عشان استضافة Render تظل نشطة 24 ساعة
 const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bot is running and alive!\n');
+    res.end('Bedrock Bot is online!\n');
 });
 
 const PORT = process.env.PORT || 3000;
@@ -12,16 +12,16 @@ server.listen(PORT, () => {
     console.log(`HTTP server is listening on port ${PORT}`);
 });
 
-// 2. إعدادات بوت ماين كرفت بيدروك
+// 2. إعدادات بوت ماين كرفت بيدروك (بدون تحديد بورت خارجي معقد، نعتمد على الـ Host المباشر)
 function createBot() {
-    console.log('جاري محاولة الاتصال بسيرفر أترنوس...');
+    console.log('جاري الاتصال بسيرفر أترنوس...');
     
     const client = bedrock.createClient({
-        host: 'LastEzdeath.aternos.me',
-        port: 45027,       // البورت المحدث
-        username: 'A',     // اسم البوت
-        version: '1.26.44.3', // إصدار السيرفر الحالي
-        offline: true      // لأن السيرفر مكرك/أترنوس
+        host: 'LastEzdeath.aternos.me', // رابط السيرفر الأساسي بدون بورت
+        port: 45027,                   // البورت الحالي
+        username: 'A',                 // اسم البوت
+        version: '1.26.44.3',          // الإصدار المطابق تماماً
+        offline: true                  // ضروري لسيرفرات أترنوس المكركة
     });
 
     client.on('spawn', () => {
@@ -33,8 +33,8 @@ function createBot() {
     });
 
     client.on('close', () => {
-        console.log('انقطع الاتصال بالسيرفر، سيتم إعادة المحاولة بعد 10 ثواني...');
-        setTimeout(createBot, 10000); // يحاول يدخل تلقائيًا لو فصل
+        console.log('انقطع الاتصال، سيتم إعادة المحاولة خلال 10 ثواني...');
+        setTimeout(createBot, 10000); // إعادة محاولة تلقائية لو فصل السيرفر
     });
 }
 
